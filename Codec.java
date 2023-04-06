@@ -1,8 +1,14 @@
 public class Codec {
 
+    //El algoritmo mapea cada letra del mensaje con una letra clave
+    //para revertirlo se ocupa el mismo procedimiento pero de forma inversa
+    //es decir, cada letra clave por una letra del abecedario normal
+
+
     private final static String ALPHABET = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private final static String KEY = "zyxwvutsrqponmlkjihgfedcba" + "ZYXWVUTSRQPONMLKJIHGFEDCBA";
 
+    
     public static String Code(String message){
         String code_messaage = "";
         for (int i = 0; i < message.length(); i++) {
@@ -29,14 +35,11 @@ public class Codec {
                 decode_message += replaceChar;
             }
         }
-
         return decode_message; 
     }
     
     public static void main(String[] args) {
-
             String test = " Hola este es un mensaje!!";
-            
             System.out.println( test );
             System.out.println( Code(test)  );
             System.out.println( Decode( Code(test) ) );
