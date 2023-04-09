@@ -8,24 +8,28 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Server {
-    private int port;
-    private List<User> online;
+
     private ServerSocket server;
+    private int port;
+
+    private List<User> online_users;
 
     public static void main(String[] args) throws IOException{
-        new Server(12345).run();
+        new Server(12345).Run();
         return;
     }
 
     public Server(int port){
         this.port = port;
-        this.online = new ArrayList<User>();
+        this.online_users = new ArrayList<User>();
     }
 
-    public void run() throws IOException{
+    public void Run() throws IOException{
         server = new ServerSocket(port);
-        System.out.println(Integer.toString(port));
+        // [Manejar excepciones del servidor aqui]
+        System.out.println("Servidor corriendo en el puerto " + Integer.toString(port));
 
+        // Escuchando nuevas conexiones
         while(true){
             Socket client = server.accept();
 
@@ -33,29 +37,29 @@ public class Server {
             String username = scan2.nextLine();
 
             User user = new User(client, username);
-            this.online.add(user);
-            System.out.println(username);
-
-            new Thread(new ServerMessage(this, user)).start();
+            this.online_users.add(user);
+            System.out.println(username + " se ha conectado.");
+            // [ Registrar en log este usuario ]
+            new Thread( new ServerMessage(this, user)).start(); // Un thread de escucha para este usuario
         }
     }
 
-    public void remove(User user){
-        this.online.remove(user);
+    public void RemoveUser(User user){
+        this.online_users.remove(user);
         return;
     }
 
-    public void sysSend(String message){
-        for(User user : this.online){
-            user.getOutputStream().println(message);
+    public void SendServerMsg(String message){
+        for(User user : this.online_users){
+            user.SendMessage(message);
         }
         return;
     }
 
-    public void send(String message, User sender){
-        for(User user : this.online){
+    public void SendUserMsg(String message, User sender){
+        for(User user : this.online_users){
             if (user != sender){
-                user.getOutputStream().println(sender.getName() + ": " + message);
+                user.SendMessage(sender.GetName() + ": " + message);
             }
         }
         return;
@@ -72,24 +76,26 @@ class ServerMessage implements Runnable {
     }
 
     public void run(){
-        server.sysSend(user.getName() + " is online.");
+        server.SendServerMsg(user.GetName() + " se ha conectado.");
 
-        String message;
-        Scanner scan3 = new Scanner(this.user.getInputStream());
-        while(scan3.hasNextLine()){
-            message = scan3.nextLine();
-            if(message.length() > 0){
-                server.send(message, user);
+        // Escuchar nuevos mensajes del usuario
+        Scanner scan = new Scanner( this.user.GetInputStream() ); 
+        while( scan.hasNextLine() ){
+            String user_message = scan.nextLine();
+            if(user_message.length() > 0){
+                server.SendUserMsg(user_message, user);
             }
         }
 
-        server.sysSend(user.getName() + " is offline.");
-        server.remove(user);
-        scan3.close();
+        server.SendServerMsg(user.GetName() + " se ha desconectado.");
+        // [LOG Registrar en el log usuario se desconecto]
+        server.RemoveUser(user);
+        scan.close();
         return;
     }
 }
 
+// Representa al usuario en el servidor
 class User{
     private InputStream inputstream;
     private PrintStream printstream;
@@ -101,15 +107,15 @@ class User{
         this.username = username;
     }
 
-    public InputStream getInputStream(){
+    public InputStream GetInputStream(){
         return this.inputstream;
     }
 
-    public PrintStream getOutputStream(){
-        return this.printstream;
+    public void SendMessage(String message){
+        this.printstream.println( message );
     }
 
-    public String getName(){
+    public String GetName(){
         return this.username;
     }
 }
