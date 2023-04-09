@@ -1,4 +1,3 @@
-package src;
 public class Codec {
 
     //El algoritmo mapea cada letra del mensaje con una letra clave
