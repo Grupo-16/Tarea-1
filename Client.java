@@ -1,9 +1,13 @@
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+
+import javax.print.attribute.standard.OutputDeviceAssigned;
 
 public class Client{
 
@@ -11,7 +15,8 @@ public class Client{
     private int port;
 
     public static void main(String[] args) throws UnknownHostException, IOException{
-        new Client("127.0.0.1", 12345).run();
+        new Client("127.0.0.1", 12345).Run();
+        // [Controlar excepciones aqui]
         return;
     }
 
@@ -20,21 +25,28 @@ public class Client{
         this.port = port;
     }
 
-    private void run() throws UnknownHostException, IOException{
+    private void Run() throws UnknownHostException, IOException{
+        // Conectarse al servidor
         Socket client = new Socket(ip, port);
-        System.out.println("Connected to server.");
+        System.out.println("Conectado al servidor.");
+        // [Log Conectado al servidor]
 
-        PrintStream output = new PrintStream(client.getOutputStream());
+        PrintStream output = new PrintStream( client.getOutputStream() ); // Para enviar mensajes
 
+        // Obtener nombre de usuario
         Scanner scan2 = new Scanner(System.in);
-        System.out.print("Enter a nickname: ");
+        System.out.print("Ingrese su nombre: ");
         String username = scan2.nextLine();
         output.println(username);
+        // [Log usuario "registrado"]
 
-        new Thread(new ClientMessage(client.getInputStream())).start();
-
-        while(scan2.hasNextLine()){
-            output.println(scan2.nextLine());
+        new Thread( new ServerMessageReceiver( client.getInputStream() ) ).start(); // Aqui llegan los mensajes
+        System.out.print(username + ": ");
+        // Esperando input del usuario
+        while( scan2.hasNextLine() ){
+            System.out.print(username + ": ");
+            String new_message = scan2.nextLine();
+            output.println(new_message);
         }
 
         output.close();
@@ -44,10 +56,12 @@ public class Client{
     }
 }
 
-class ClientMessage implements Runnable{
+// Clase para recibir mensajes del servidor
+class ServerMessageReceiver implements Runnable{
+
     private InputStream server;
 
-    public ClientMessage(InputStream server){
+    public ServerMessageReceiver(InputStream server){
         this.server = server;
     }
 
@@ -61,4 +75,5 @@ class ClientMessage implements Runnable{
         scan.close();
         return;
     }
+
 }
