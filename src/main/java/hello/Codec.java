@@ -38,14 +38,4 @@ public class Codec {
         }
         return decode_message; 
     }
-    
-    public static void main(String[] args) {
-            String test = " Hola este es un mensaje!!";
-            System.out.println( test );
-            System.out.println( Code(test)  );
-            System.out.println( Decode( Code(test) ) );
-    }
-
-
-
 }

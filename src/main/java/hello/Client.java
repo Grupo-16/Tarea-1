@@ -9,13 +9,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 import javax.print.attribute.standard.OutputDeviceAssigned;
-
+import org.apache.log4j.Logger;
 
 
 public class Client{
-
     private String ip;
     private int port;
+    final static Logger logger = Logger.getLogger("client");
 
     public Client(String ip, int port){
         this.ip = ip;
@@ -26,23 +26,16 @@ public class Client{
         // Conectarse al servidor
         Socket client = new Socket(ip, port);
         System.out.println("Conectado al servidor.");
-        // [Log Conectado al servidor]
+        logger.info("Conectado al servidor.");
 
-        PrintStream output = new PrintStream( client.getOutputStream() ); // Para enviar mensajes
+        new Thread( new ServerMessageReceiver( client.getInputStream(), logger ) ).start(); // Aqui llegan los mensajes
 
-        // Obtener nombre de usuario
         Scanner scan2 = new Scanner(System.in);
-        System.out.print("Ingrese su nombre: ");
-        String username = scan2.nextLine();
-        output.println(username);
-        // [Log usuario "registrado"]
-
-        new Thread( new ServerMessageReceiver( client.getInputStream() ) ).start(); // Aqui llegan los mensajes
-
-        // Esperando input del usuario
-        while( scan2.hasNextLine() ){
+        PrintStream output = new PrintStream( client.getOutputStream() );
+        while( scan2.hasNextLine() ){ // Esperando input del usuario
             String new_message = scan2.nextLine();
             new_message = hello.Codec.Code(new_message); // Codificar mensaje
+            logger.info( "mensaje codificado: " + hello.Codec.Code(new_message));
             output.println(new_message); // Enviar mensaje
         }
 
@@ -56,9 +49,11 @@ public class Client{
 // Clase para recibir mensajes del servidor
 class ServerMessageReceiver implements Runnable{
     private InputStream server;
+    Logger logger;
 
-    public ServerMessageReceiver(InputStream server){
+    public ServerMessageReceiver(InputStream server, Logger logger){
         this.server = server;
+        this.logger = logger;
     }
 
     public void run(){
@@ -67,6 +62,7 @@ class ServerMessageReceiver implements Runnable{
         while(scan.hasNextLine()){
             message = scan.nextLine();
             System.out.println(message);
+            logger.info("Nuevo mensaje: " + message );
         }
         scan.close();
         return;
