@@ -14,7 +14,7 @@ public class Server {
 
     private List<User> online_users;
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args){
         new Server(12345).Run();
         return;
     }
@@ -24,21 +24,51 @@ public class Server {
         this.online_users = new ArrayList<User>();
     }
 
-    public void Run() throws IOException{
-        server = new ServerSocket(port);
+    public void Run(){
+
+        try{
+            server = new ServerSocket(port);
+        } catch(Exception e){
+            System.out.println(e);
+            //log fail
+            return;
+        }
+        
         // [Manejar excepciones del servidor aqui]
         System.out.println("Servidor corriendo en el puerto " + Integer.toString(port));
 
         // Escuchando nuevas conexiones
         while(true){
-            Socket client = server.accept();
+            Socket client;
+            try{
+                client = server.accept();
+            } catch(Exception e){
+                System.out.println(e);
+                //log fail;
+                return;
+            }
 
-            Scanner scan2 = new Scanner(client.getInputStream());
-            String username = scan2.nextLine();
+            String username;
+            try{
+                Scanner scan2 = new Scanner(client.getInputStream());
+                username = scan2.nextLine();
+            } catch(Exception e){
+                System.out.println(e);
+                //log fail
+                return;
+            }
 
-            User user = new User(client, username);
-            this.online_users.add(user);
-            System.out.println(username + " se ha conectado.");
+            User user;
+            try{
+                user = new User(client, username);
+                this.online_users.add(user);
+                System.out.println(username + " se ha conectado.");
+            } catch(Exception e){
+                System.out.println(e);
+                //log fail
+                return;
+            }
+            
             // [ Registrar en log este usuario ]
             new Thread( new ServerMessage(this, user)).start(); // Un thread de escucha para este usuario
         }
@@ -101,9 +131,15 @@ class User{
     private PrintStream printstream;
     private String username;
 
-    public User(Socket client, String username) throws IOException {
-        this.inputstream = client.getInputStream();
-        this.printstream = new PrintStream(client.getOutputStream());
+    public User(Socket client, String username){
+        try{
+            this.inputstream = client.getInputStream();
+            this.printstream = new PrintStream(client.getOutputStream());
+        } catch(Exception e){
+            System.out.println(e);
+            //log fail
+            return;
+        }
         this.username = username;
     }
 

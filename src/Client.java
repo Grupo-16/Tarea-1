@@ -14,7 +14,7 @@ public class Client{
     private String ip;
     private int port;
 
-    public static void main(String[] args) throws UnknownHostException, IOException{
+    public static void main(String[] args){
         new Client("127.0.0.1", 12345).Run();
         // [Controlar excepciones aqui]
         return;
@@ -25,13 +25,31 @@ public class Client{
         this.port = port;
     }
 
-    private void Run() throws UnknownHostException, IOException{
+    private void Run(){
         // Conectarse al servidor
-        Socket client = new Socket(ip, port);
-        System.out.println("Conectado al servidor.");
-        // [Log Conectado al servidor]
+        //Socket client = createClient(ip, port);
+        Socket client;
+        try{
+            client = new Socket(ip, port);
+            System.out.println("Conectado al servidor.");
+            // [Log Conectado al servidor]
+        } catch(Exception e){
+            System.out.println(e);
+            System.out.println("No pudo conectarse al servidor.");
+            //log fail
+            return;
+        }
 
-        PrintStream output = new PrintStream( client.getOutputStream() ); // Para enviar mensajes
+        PrintStream output;
+        try{
+            output = new PrintStream( client.getOutputStream() ); // Para enviar mensajes
+        } catch(Exception e){
+            System.out.println(e);
+            System.out.println("");
+            //log fail
+            closeClient(client);
+            return;
+        }
 
         // Obtener nombre de usuario
         Scanner scan2 = new Scanner(System.in);
@@ -40,19 +58,39 @@ public class Client{
         output.println(username);
         // [Log usuario "registrado"]
 
-        new Thread( new ServerMessageReceiver( client.getInputStream() ) ).start(); // Aqui llegan los mensajes
-        System.out.print(username + ": ");
+        try{
+            // Aqui llegan los mensajes
+            new Thread( new ServerMessageReceiver( client.getInputStream() ) ).start(); 
+        } catch(Exception e){
+            System.out.println(e);
+            System.out.println("No pudo crearse Thread.");
+            //log fail
+            scan2.close();
+            closeClient(client);
+            return;
+        }
+
         // Esperando input del usuario
         while( scan2.hasNextLine() ){
-            System.out.print(username + ": ");
             String new_message = scan2.nextLine();
             output.println(new_message);
         }
-
+        
         output.close();
         scan2.close();
-        client.close();
+        closeClient(client);
         return;
+    }
+
+    private void closeClient(Socket client){
+        try{
+            client.close();
+        } catch(Exception e){
+            System.out.println(e);
+            System.out.println("Error al cerrar Client.");
+            //log fail
+            return;
+        }
     }
 }
 
