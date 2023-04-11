@@ -1,3 +1,5 @@
+package hello;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,26 +8,27 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-
 import javax.print.attribute.standard.OutputDeviceAssigned;
+
+
 
 public class Client{
 
     private String ip;
     private int port;
-
+    /* 
     public static void main(String[] args) throws UnknownHostException, IOException{
         new Client("127.0.0.1", 12345).Run();
         // [Controlar excepciones aqui]
         return;
     }
-
-    private Client(String ip, int port){
+    */
+    public Client(String ip, int port){
         this.ip = ip;
         this.port = port;
     }
 
-    private void Run() throws UnknownHostException, IOException{
+    public void Run() throws UnknownHostException, IOException{
         // Conectarse al servidor
         Socket client = new Socket(ip, port);
         System.out.println("Conectado al servidor.");
