@@ -22,26 +22,54 @@ public class Client{
         this.port = port;
     }
 
-    public void Run() throws UnknownHostException, IOException{
+    public void Run(){
         // Conectarse al servidor
-        Socket client = new Socket(ip, port);
+        Socket client = null;
+        try{
+            client = new Socket(ip, port);
+        }catch(Exception e){
+            logger.fatal( e.getMessage() );
+            return;
+        }
         System.out.println("Conectado al servidor.");
         logger.info("Conectado al servidor.");
-
-        new Thread( new ServerMessageReceiver( client.getInputStream(), logger ) ).start(); // Aqui llegan los mensajes
+        try{
+            new Thread( new ServerMessageReceiver( client.getInputStream(), logger ) ).start(); // Aqui llegan los mensajes
+        }catch(Exception e){
+            logger.fatal( e.getMessage() );
+            try {
+                client.close();
+            } catch (IOException e1) { e1.printStackTrace(); }
+            return;
+        }
+        PrintStream output = null;
+        try{
+            output = new PrintStream( client.getOutputStream() );
+        }
+        catch(Exception e){
+            logger.fatal( e.getMessage() );
+            try {
+                client.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            return;
+        }
 
         Scanner scan2 = new Scanner(System.in);
-        PrintStream output = new PrintStream( client.getOutputStream() );
         while( scan2.hasNextLine() ){ // Esperando input del usuario
             String new_message = scan2.nextLine();
             new_message = hello.Codec.Code(new_message); // Codificar mensaje
             logger.info( "mensaje codificado: " + hello.Codec.Code(new_message));
             output.println(new_message); // Enviar mensaje
         }
-
         output.close();
         scan2.close();
-        client.close();
+        try {
+            client.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
         return;
     }
 }

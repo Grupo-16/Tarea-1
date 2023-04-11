@@ -21,15 +21,34 @@ public class Server {
         this.online_users = new ArrayList<User>();
     }
 
-    public void Run() throws IOException{
-        server = new ServerSocket(port);
-        // [Manejar excepciones del servidor aqui]
+    public void Run(){
+        try{
+            server = new ServerSocket(port);
+        }catch(IOException e){
+            logger.fatal( e.getMessage() );
+            return;
+        }
         System.out.println("Servidor corriendo en el puerto " + Integer.toString(port));
         logger.info( "Servidor corriendo en el puerto " + Integer.toString(port) );
         // Escuchando nuevas conexiones
         while(true){
-            Socket client = server.accept();
-            User user = AddUser(client);
+            Socket client = null;
+            try{
+                client = server.accept();
+            }catch(Exception e){
+                logger.fatal( e.getMessage() );
+                return;
+            }
+
+            User user = null;
+            try{
+                user = AddUser(client);
+            }catch(IOException e){
+                logger.fatal( "Fallo al agregar usuario, el socket esta ocupado o desconectado");
+                logger.fatal( e.getMessage() );
+                return;
+            }
+
             user.SendMessage( "Conectado al servidor como " + user.GetName() ); // Informar al cliente
             System.out.println(user.GetName() + " se ha conectado.");
             logger.info( user.GetName() + " se ha conectado." ); 
