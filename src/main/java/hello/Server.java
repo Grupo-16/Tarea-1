@@ -1,3 +1,4 @@
+package hello;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -14,10 +15,12 @@ public class Server {
 
     private List<User> online_users;
 
+    /* 
     public static void main(String[] args) throws IOException{
         new Server(12345).Run();
         return;
     }
+    */
 
     public Server(int port){
         this.port = port;
