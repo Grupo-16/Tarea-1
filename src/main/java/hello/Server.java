@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class Server {
 
@@ -14,13 +15,9 @@ public class Server {
     private int port;
 
     private List<User> online_users;
+    private int users_count = 0;
 
-    /* 
-    public static void main(String[] args) throws IOException{
-        new Server(12345).Run();
-        return;
-    }
-    */
+    final static Logger logger = Logger.getLogger("server");
 
     public Server(int port){
         this.port = port;
@@ -31,44 +28,32 @@ public class Server {
         server = new ServerSocket(port);
         // [Manejar excepciones del servidor aqui]
         System.out.println("Servidor corriendo en el puerto " + Integer.toString(port));
-
         // Escuchando nuevas conexiones
         while(true){
             Socket client = server.accept();
-
-            Scanner scan2 = new Scanner(client.getInputStream());
-            String username = scan2.nextLine();
-
-            User user = new User(client, username);
-            this.online_users.add(user);
-            System.out.println(username + " se ha conectado.");
-            // [ Registrar en log este usuario ]
-            new Thread( new ServerMessage(this, user)).start(); // Un thread de escucha para este usuario
+            User user = AddUser(client);
+            System.out.println(user.GetName() + " se ha conectado.");
+            logger.info( user.GetName() + " se ha conectado." );
         }
+    }
+
+    public User AddUser(Socket client)throws IOException{
+        String username = "User" + String.valueOf(users_count);
+        User user = new User(client, username);
+        this.online_users.add(user);
+        users_count += 1;
+        new Thread( new ServerMessage(this, user)).start(); // Un thread de escucha para este usuario
+        user.SendMessage( "Conectado al servidor como " + user.GetName() );
+        return user;
     }
 
     public void RemoveUser(User user){
         this.online_users.remove(user);
         return;
     }
-
-    public void SendServerMsg(String message){
-        for(User user : this.online_users){
-            user.SendMessage(message);
-        }
-        return;
-    }
-
-    public void SendUserMsg(String message, User sender){
-        for(User user : this.online_users){
-            if (user != sender){
-                user.SendMessage(sender.GetName() + ": " + message);
-            }
-        }
-        return;
-    }
 }
 
+// Hilo para la escucha de cada cliente
 class ServerMessage implements Runnable {
     public Server server;
     public User user;
@@ -79,18 +64,16 @@ class ServerMessage implements Runnable {
     }
 
     public void run(){
-        server.SendServerMsg(user.GetName() + " se ha conectado.");
-
-        // Escuchar nuevos mensajes del usuario
         Scanner scan = new Scanner( this.user.GetInputStream() ); 
+        // Escuchar nuevos mensajes del usuario
         while( scan.hasNextLine() ){
             String user_message = scan.nextLine();
             if(user_message.length() > 0){
-                server.SendUserMsg(user_message, user);
+                user_message = hello.Codec.Decode(user_message); // Decoficiar mensaje
+                System.out.println(  this.user.GetName() + ": " +  user_message); 
             }
         }
-
-        server.SendServerMsg(user.GetName() + " se ha desconectado.");
+        System.out.println(  "Usuario " + this.user.GetName() + "se ha desconectado."); 
         // [LOG Registrar en el log usuario se desconecto]
         server.RemoveUser(user);
         scan.close();
@@ -98,7 +81,8 @@ class ServerMessage implements Runnable {
     }
 }
 
-// Representa al usuario en el servidor
+
+// Representa a un cliente en el servidor
 class User{
     private InputStream inputstream;
     private PrintStream printstream;

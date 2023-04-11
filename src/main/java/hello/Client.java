@@ -16,13 +16,7 @@ public class Client{
 
     private String ip;
     private int port;
-    /* 
-    public static void main(String[] args) throws UnknownHostException, IOException{
-        new Client("127.0.0.1", 12345).Run();
-        // [Controlar excepciones aqui]
-        return;
-    }
-    */
+
     public Client(String ip, int port){
         this.ip = ip;
         this.port = port;
@@ -44,12 +38,12 @@ public class Client{
         // [Log usuario "registrado"]
 
         new Thread( new ServerMessageReceiver( client.getInputStream() ) ).start(); // Aqui llegan los mensajes
-        System.out.print(username + ": ");
+
         // Esperando input del usuario
         while( scan2.hasNextLine() ){
-            System.out.print(username + ": ");
             String new_message = scan2.nextLine();
-            output.println(new_message);
+            new_message = hello.Codec.Code(new_message); // Codificar mensaje
+            output.println(new_message); // Enviar mensaje
         }
 
         output.close();
@@ -61,7 +55,6 @@ public class Client{
 
 // Clase para recibir mensajes del servidor
 class ServerMessageReceiver implements Runnable{
-
     private InputStream server;
 
     public ServerMessageReceiver(InputStream server){
