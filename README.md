@@ -32,12 +32,12 @@ o simplemente ejecutar el archivo build.bat
 Una vez hecha la instalacion el archivo .jar generado se puede encontrar en la carpeta target. Luego para correr el servidor debes ejecutar el siguiente comando en una consola abierta en el root del proyecto:
 
 ```
-java -cp target/main-0.1.0.jar hello.Main server
+java -cp target/main-0.1.0.jar mensajeria.Main server
 ```
 Una vez el servidor este corriendo, deberas ejecutar el siguiente comando en una consola aparte correr el cliente:
 
 ```
-java -cp target/main-0.1.0.jar hello.Main client
+java -cp target/main-0.1.0.jar mensajeria.Main client
 ```
 **Advertencia: Para que todo funcione bien se necesita correr primero el servidor y luego el cliente**
 
