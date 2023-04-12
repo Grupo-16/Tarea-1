@@ -1,8 +1,0 @@
-2023-04-11 14:11:01,125 [main] INFO  (Server.java:28) - Servidor corriendo en el puerto 12345
-  2023-04-11 21:14:22,303 [main] INFO  (Server.java:32) - Servidor corriendo en el puerto 12345
-  2023-04-11 21:14:38,011 [main] INFO  (Server.java:32) - Servidor corriendo en el puerto 12345
-  2023-04-11 21:14:41,592 [main] INFO  (Client.java:35) - Conectado al servidor.
-  2023-04-11 21:14:41,594 [main] INFO  (Server.java:54) - User0 se ha conectado.
-  2023-04-11 21:14:41,608 [Thread-0] INFO  (Client.java:93) - Nuevo mensaje: Conectado al servidor como User0
-  2023-04-11 21:14:46,376 [Thread-0] INFO  (Server.java:69) - User0 se ha desconectado.
-  

@@ -6,8 +6,8 @@ public class Codec {
     //es decir, cada letra clave por una letra del abecedario normal
 
 
-    private final static String ALPHABET = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private final static String KEY = "zyxwvutsrqponmlkjihgfedcba" + "ZYXWVUTSRQPONMLKJIHGFEDCBA";
+    private final static String ALPHABET = "abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
+    private final static String KEY = "zyxwvutsrqponmlkjihgfedcba" + "ZYXWVUTSRQPONMLKJIHGFEDCBA987654321";
 
     
     public static String Code(String message){
