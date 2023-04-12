@@ -1,4 +1,4 @@
-package hello;
+package mensajeria;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -89,7 +89,7 @@ class ServerMessage implements Runnable {
         while( scan.hasNextLine() ){ // Escuchar nuevos mensajes del usuario
             String user_message = scan.nextLine();
             if(user_message.length() > 0){
-                user_message = hello.Codec.Decode(user_message); // Decoficiar mensaje
+                user_message = mensajeria.Codec.Decode(user_message); // Decoficiar mensaje
                 logger.info(this.user.GetName() + " decodificado: " +  user_message);
                 System.out.println(  this.user.GetName() + ": " +  user_message); 
             }

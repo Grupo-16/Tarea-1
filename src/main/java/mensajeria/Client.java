@@ -1,4 +1,4 @@
-package hello;
+package mensajeria;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -59,8 +59,8 @@ public class Client{
         Scanner scan2 = new Scanner(System.in);
         while( scan2.hasNextLine() ){ // Esperando input del usuario
             String new_message = scan2.nextLine();
-            new_message = hello.Codec.Code(new_message); // Codificar mensaje
-            logger.info( "mensaje codificado: " + hello.Codec.Code(new_message));
+            new_message = mensajeria.Codec.Code(new_message); // Codificar mensaje
+            logger.info( "mensaje codificado: " + new_message);
             output.println(new_message); // Enviar mensaje
         }
         output.close();
